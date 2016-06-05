@@ -17,26 +17,92 @@
  */
 package com.mebigfatguy.central4j;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+import com.mebigfatguy.central4j.internal.CentralURLs;
 
 public class ArtifactIterator implements Iterator<Artifact> {
 
-    private Map<String, List<String>> browseResults;
+    private static final Set<String> IGNORED_EXTENSIONS;
+
+    static {
+        Set<String> ie = new HashSet<String>();
+        ie.add("");
+        ie.add("asc");
+        ie.add("html");
+        ie.add("md5");
+        ie.add("pom");
+        ie.add("sha1");
+        ie.add("xml");
+
+        IGNORED_EXTENSIONS = Collections.unmodifiableSet(ie);
+    }
+
+    private Deque<String> browseResults;
 
     public ArtifactIterator() {
-
+        browseResults = new ArrayDeque<>(200);
+        populateBrowse(CentralURLs.ITERATION_URL);
     }
 
     @Override
     public boolean hasNext() {
-        return false;
+        return !browseResults.isEmpty();
     }
 
     @Override
     public Artifact next() {
         return null;
+    }
+
+    private void populateBrowse(URL u) {
+        try (InputStream is = new BufferedInputStream(u.openStream())) {
+
+            XMLReader r = XMLReaderFactory.createXMLReader();
+            r.setContentHandler(new BrowseHandler(""));
+            r.parse(new InputSource(is));
+        } catch (IOException | SAXException e) {
+            // we just won't return results
+        }
+    }
+
+    class BrowseHandler extends DefaultHandler {
+
+        private String root;
+
+        public BrowseHandler(String rootPath) {
+            root = rootPath + '/';
+        }
+
+        @Override
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+            if ("a".equals(localName)) {
+                String href = attributes.getValue("href");
+                int dotPos = href.lastIndexOf('.');
+
+                String extension = dotPos < 0 ? "ok" : href.substring(dotPos + 1);
+
+                if (!IGNORED_EXTENSIONS.contains(extension)) {
+                    browseResults.addLast(root + href);
+                }
+            }
+        }
     }
 
 }
