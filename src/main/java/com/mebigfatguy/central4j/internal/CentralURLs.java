@@ -15,28 +15,28 @@
  * See the License for the specific language governing permissions and limitations
  * under the License.
  */
-package com.mebigfatguy.central4j;
+package com.mebigfatguy.central4j.internal;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.net.URL;
 
-public class ArtifactIterator implements Iterator<Artifact> {
+public class CentralURLs {
 
-    private Map<String, List<String>> browseResults;
+    public static final URL ITERATION_URL;
+    public static final URL SEARCH_URL;
 
-    public ArtifactIterator() {
+    static {
+        URL iu;
+        URL su;
+        try {
+            iu = new URL("http://repo1.maven.org/maven2/");
+            su = new URL("http://search.maven.org/solrsearch/select");
+        } catch (Exception e) {
+            iu = null;
+            su = null;
+        }
+
+        ITERATION_URL = iu;
+        SEARCH_URL = su;
 
     }
-
-    @Override
-    public boolean hasNext() {
-        return false;
-    }
-
-    @Override
-    public Artifact next() {
-        return null;
-    }
-
 }
