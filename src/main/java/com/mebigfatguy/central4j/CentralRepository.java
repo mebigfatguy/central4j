@@ -17,7 +17,11 @@
  */
 package com.mebigfatguy.central4j;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 public class CentralRepository implements Iterable<Artifact> {
 
@@ -25,4 +29,29 @@ public class CentralRepository implements Iterable<Artifact> {
     public Iterator<Artifact> iterator() {
         return new ArtifactIterator();
     }
+
+    public List<Artifact> getArtifactsByGroupId(String groupId) throws IOException {
+        return Collections.emptyList();
+    }
+
+    public List<Artifact> getArtifactsByArtifactId(String groupId) throws IOException {
+        return Collections.emptyList();
+    }
+
+    public List<String> getVersions(String groupId, String artifactId) throws IOException {
+        return Collections.emptyList();
+    }
+
+    public String getLatestVersion(String groupId, String artifactId) throws IOException {
+        return null;
+    }
+
+    public InputStream getArtifact(String groupId, String artifactId, String version) throws IOException {
+        return null;
+    }
+
+    public InputStream getArtifact(String groupId, String artifactId, String version, String classifier) throws IOException {
+        return null;
+    }
+
 }
