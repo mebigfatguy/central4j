@@ -21,15 +21,11 @@ public class Artifact implements Comparable<Artifact> {
 
     private String groupId;
     private String artifactId;
-    private String type;
     private String version;
-    private String classifier;
 
-    public Artifact(String groupId, String artifactId, String type, String classifier, String version) {
+    public Artifact(String groupId, String artifactId, String version) {
         this.groupId = groupId;
         this.artifactId = artifactId;
-        this.type = type;
-        this.classifier = classifier;
         this.version = version;
     }
 
@@ -41,21 +37,13 @@ public class Artifact implements Comparable<Artifact> {
         return artifactId;
     }
 
-    public String getType() {
-        return type;
-    }
-
     public String getVersion() {
         return version;
     }
 
-    public String getClassifier() {
-        return classifier;
-    }
-
     @Override
     public int hashCode() {
-        return groupId.hashCode() ^ artifactId.hashCode() ^ type.hashCode() ^ classifier.hashCode() ^ version.hashCode();
+        return groupId.hashCode() ^ artifactId.hashCode() ^ version.hashCode();
     }
 
     @Override
@@ -65,8 +53,7 @@ public class Artifact implements Comparable<Artifact> {
         }
 
         Artifact that = (Artifact) o;
-        return groupId.equals(that.groupId) && artifactId.equals(that.artifactId) && type.equals(that.type) && classifier.equals(that.classifier)
-                && version.equals(that.version);
+        return groupId.equals(that.groupId) && artifactId.equals(that.artifactId) && version.equals(that.version);
     }
 
     @Override
@@ -81,23 +68,11 @@ public class Artifact implements Comparable<Artifact> {
             return cmp;
         }
 
-        cmp = type.compareTo(a.type);
-        if (cmp != 0) {
-            return cmp;
-        }
-
-        cmp = classifier.compareTo(a.classifier);
-        if (cmp != 0) {
-            return cmp;
-        }
-        ;
-
         return version.compareTo(a.version);
     }
 
     @Override
     public String toString() {
-        return "Artifact [groupId=" + groupId + ", artifactId=" + artifactId + ", type=" + type + (!classifier.isEmpty() ? ", classifier=" + classifier : "")
-                + ", version=" + version + "]";
+        return "Artifact [groupId=" + groupId + ", artifactId=" + artifactId + ", version=" + version + "]";
     }
 }

@@ -17,11 +17,21 @@
  */
 package com.mebigfatguy.central4j;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.mebigfatguy.central4j.internal.CentralURLs;
 
 public class CentralRepository implements Iterable<Artifact> {
 
@@ -31,7 +41,30 @@ public class CentralRepository implements Iterable<Artifact> {
     }
 
     public List<Artifact> getArtifactsByGroupId(String groupId) throws IOException {
-        return Collections.emptyList();
+
+        URL u = new URL(CentralURLs.SEARCH_URL + "?q=g:\"" + groupId + "\"&rows=100&wt=json");
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+
+            String result = readerToString(br);
+
+            JSONObject jo = new JSONObject(result);
+            jo = jo.getJSONObject("response");
+            int count = jo.getInt("numFound");
+
+            List<Artifact> artifacts = new ArrayList<>(count);
+
+            JSONArray docs = jo.getJSONArray("docs");
+
+            for (int i = 0; i < count; i++) {
+                JSONObject jsonArtifact = docs.getJSONObject(i);
+
+                artifacts.add(new Artifact(jsonArtifact.getString("g"), jsonArtifact.getString("a"), jsonArtifact.getString("latestVersion")));
+
+            }
+
+            return artifacts;
+
+        }
     }
 
     public List<Artifact> getArtifactsByArtifactId(String groupId) throws IOException {
@@ -52,6 +85,18 @@ public class CentralRepository implements Iterable<Artifact> {
 
     public InputStream getArtifact(String groupId, String artifactId, String version, String classifier) throws IOException {
         return null;
+    }
+
+    private String readerToString(BufferedReader br) throws IOException {
+        StringBuilder sb = new StringBuilder();
+
+        String line = br.readLine();
+        while (line != null) {
+            sb.append(line);
+            line = br.readLine();
+        }
+
+        return sb.toString();
     }
 
 }

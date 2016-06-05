@@ -71,8 +71,8 @@ public class ArtifactIterator implements Iterator<Artifact> {
         return null;
     }
 
-    private void populateBrowse(URL u) {
-        try (InputStream is = new BufferedInputStream(u.openStream())) {
+    private void populateBrowse(String u) {
+        try (InputStream is = new BufferedInputStream(new URL(u).openStream())) {
 
             XMLReader r = XMLReaderFactory.createXMLReader();
             r.setContentHandler(new BrowseHandler(""));

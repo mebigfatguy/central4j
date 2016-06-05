@@ -17,26 +17,8 @@
  */
 package com.mebigfatguy.central4j.internal;
 
-import java.net.URL;
-
 public class CentralURLs {
 
-    public static final URL ITERATION_URL;
-    public static final URL SEARCH_URL;
-
-    static {
-        URL iu;
-        URL su;
-        try {
-            iu = new URL("http://repo1.maven.org/maven2/");
-            su = new URL("http://search.maven.org/solrsearch/select");
-        } catch (Exception e) {
-            iu = null;
-            su = null;
-        }
-
-        ITERATION_URL = iu;
-        SEARCH_URL = su;
-
-    }
+    public static final String ITERATION_URL = "http://repo1.maven.org/maven2";
+    public static final String SEARCH_URL = "http://search.maven.org/solrsearch/select";
 }
