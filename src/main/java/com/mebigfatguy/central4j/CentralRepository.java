@@ -67,8 +67,30 @@ public class CentralRepository implements Iterable<Artifact> {
         }
     }
 
-    public List<Artifact> getArtifactsByArtifactId(String groupId) throws IOException {
-        return Collections.emptyList();
+    public List<Artifact> getArtifactsByArtifactId(String artifactId) throws IOException {
+        URL u = new URL(CentralURLs.SEARCH_URL + "?q=a:\"" + artifactId + "\"&rows=100&wt=json");
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+
+            String result = readerToString(br);
+
+            JSONObject jo = new JSONObject(result);
+            jo = jo.getJSONObject("response");
+            int count = jo.getInt("numFound");
+
+            List<Artifact> artifacts = new ArrayList<>(count);
+
+            JSONArray docs = jo.getJSONArray("docs");
+
+            for (int i = 0; i < count; i++) {
+                JSONObject jsonArtifact = docs.getJSONObject(i);
+
+                artifacts.add(new Artifact(jsonArtifact.getString("g"), jsonArtifact.getString("a"), jsonArtifact.getString("latestVersion")));
+
+            }
+
+            return artifacts;
+
+        }
     }
 
     public List<String> getVersions(String groupId, String artifactId) throws IOException {
