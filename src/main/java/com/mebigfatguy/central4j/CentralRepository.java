@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -94,7 +93,29 @@ public class CentralRepository implements Iterable<Artifact> {
     }
 
     public List<String> getVersions(String groupId, String artifactId) throws IOException {
-        return Collections.emptyList();
+
+        URL u = new URL(CentralURLs.SEARCH_URL + "?q=g:\"" + groupId + "\"+AND+a:\"" + artifactId + "\"&core=gav&rows=100&wt=json");
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+
+            String result = readerToString(br);
+
+            JSONObject jo = new JSONObject(result);
+            jo = jo.getJSONObject("response");
+            int count = jo.getInt("numFound");
+
+            List<String> versions = new ArrayList<>(count);
+
+            JSONArray docs = jo.getJSONArray("docs");
+
+            for (int i = 0; i < count; i++) {
+                JSONObject jsonArtifact = docs.getJSONObject(i);
+
+                versions.add(jsonArtifact.getString("v"));
+
+            }
+
+            return versions;
+        }
     }
 
     public String getLatestVersion(String groupId, String artifactId) throws IOException {

@@ -43,4 +43,14 @@ public class CentralRepositoryTest {
         Assert.assertEquals("com.xeiam", artifacts.get(1).getGroupId());
         Assert.assertEquals("org.knowm", artifacts.get(2).getGroupId());
     }
+
+    @Test
+    public void testGetVersions() throws IOException {
+
+        CentralRepository r = new CentralRepository();
+
+        List<String> versions = r.getVersions("com.mebigfatguy.yank", "yank");
+
+        Assert.assertEquals("0.2.0", versions.get(versions.size() - 1));
+    }
 }
