@@ -17,7 +17,6 @@
  */
 package com.mebigfatguy.central4j;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -160,7 +159,7 @@ public class CentralRepository implements Iterable<Artifact> {
 
         URL u = new URL(CentralURLs.DOWNLOAD_URL + '/' + groupId.replace('.', '/') + '/' + artifactId + '/' + version + '/' + artifactId + '-' + version
                 + ((classifier != null) ? ("-" + classifier) : "") + ".jar");
-        return new BufferedInputStream(u.openStream());
+        return u.openStream();
     }
 
     private String readerToString(BufferedReader br) throws IOException {
