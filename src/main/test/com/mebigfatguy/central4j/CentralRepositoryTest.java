@@ -53,4 +53,14 @@ public class CentralRepositoryTest {
 
         Assert.assertEquals("0.2.0", versions.get(versions.size() - 1));
     }
+
+    @Test
+    public void testGetLatestVersion() throws IOException {
+
+        CentralRepository r = new CentralRepository();
+
+        String version = r.getLatestVersion("com.mebigfatguy.yank", "yank");
+
+        Assert.assertEquals("1.6.1", version);
+    }
 }
