@@ -17,6 +17,7 @@
  */
 package com.mebigfatguy.central4j;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,11 +59,9 @@ public class CentralRepository implements Iterable<Artifact> {
                 JSONObject jsonArtifact = docs.getJSONObject(i);
 
                 artifacts.add(new Artifact(jsonArtifact.getString("g"), jsonArtifact.getString("a"), jsonArtifact.getString("latestVersion")));
-
             }
 
             return artifacts;
-
         }
     }
 
@@ -142,12 +141,26 @@ public class CentralRepository implements Iterable<Artifact> {
         }
     }
 
+    public String getPom(String groupId, String artifactId, String version) throws IOException {
+
+        URL u = new URL(
+                CentralURLs.DOWNLOAD_URL + '/' + groupId.replace('.', '/') + '/' + artifactId + '/' + version + '/' + artifactId + '-' + version + ".pom");
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+
+            return readerToString(br);
+        }
+    }
+
     public InputStream getArtifact(String groupId, String artifactId, String version) throws IOException {
-        return null;
+        return getArtifact(groupId, artifactId, version, null);
     }
 
     public InputStream getArtifact(String groupId, String artifactId, String version, String classifier) throws IOException {
-        return null;
+
+        URL u = new URL(CentralURLs.DOWNLOAD_URL + '/' + groupId.replace('.', '/') + '/' + artifactId + '/' + version + '/' + artifactId + '-' + version
+                + ((classifier != null) ? ("-" + classifier) : "") + ".jar");
+        return new BufferedInputStream(u.openStream());
     }
 
     private String readerToString(BufferedReader br) throws IOException {

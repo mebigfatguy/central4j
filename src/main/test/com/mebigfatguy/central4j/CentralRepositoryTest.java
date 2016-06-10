@@ -1,6 +1,8 @@
 package com.mebigfatguy.central4j;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -62,5 +64,57 @@ public class CentralRepositoryTest {
         String version = r.getLatestVersion("com.mebigfatguy.yank", "yank");
 
         Assert.assertEquals("1.6.1", version);
+    }
+
+    @Test
+    public void testGetPom() throws IOException {
+
+        CentralRepository r = new CentralRepository();
+
+        String pom = r.getPom("com.mebigfatguy.fb-delta", "fb-delta", "0.2.0");
+
+        Assert.assertNotNull(pom);
+        Assert.assertEquals(5991, pom.length());
+    }
+
+    @Test
+    public void testGetArtifact() throws IOException {
+
+        CentralRepository r = new CentralRepository();
+
+        try (InputStream is = r.getArtifact("com.mebigfatguy.fb-delta", "fb-delta", "0.2.0"); ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+
+            byte[] buffer = new byte[1024];
+            int len = is.read(buffer);
+            long total = 0;
+            while (len >= 0) {
+                total += len;
+                baos.write(buffer, 0, len);
+                len = is.read(buffer);
+            }
+
+            Assert.assertEquals(8561, total);
+        }
+    }
+
+    @Test
+    public void testGetClassifierArtifact() throws IOException {
+
+        CentralRepository r = new CentralRepository();
+
+        try (InputStream is = r.getArtifact("com.mebigfatguy.fb-delta", "fb-delta", "0.2.0", "sources");
+                ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+
+            byte[] buffer = new byte[1024];
+            int len = is.read(buffer);
+            long total = 0;
+            while (len >= 0) {
+                total += len;
+                baos.write(buffer, 0, len);
+                len = is.read(buffer);
+            }
+
+            Assert.assertEquals(8305, total);
+        }
     }
 }
