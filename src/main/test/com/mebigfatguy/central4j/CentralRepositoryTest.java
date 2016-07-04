@@ -3,6 +3,7 @@ package com.mebigfatguy.central4j;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -11,6 +12,18 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class CentralRepositoryTest {
+
+    @Test
+    public void testIterate() {
+        CentralRepository r = new CentralRepository();
+
+        List<Artifact> artifacts = new ArrayList<>();
+        for (Artifact a : r.subGroupIterable("com.mebigfatguy")) {
+            artifacts.add(a);
+        }
+
+        Assert.assertEquals(10, artifacts.size());
+    }
 
     @Test
     public void testGetArtifactsByGroupId() throws IOException {

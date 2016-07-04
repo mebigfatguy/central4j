@@ -22,10 +22,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.xml.sax.Attributes;
@@ -40,10 +42,12 @@ import com.mebigfatguy.central4j.internal.CentralURLs;
 public class ArtifactIterator implements Iterator<Artifact> {
 
     private static final Set<String> IGNORED_EXTENSIONS;
+    private static final String MAVEN_META_DATA = "maven-metadata.xml";
 
     static {
         Set<String> ie = new HashSet<>();
         ie.add("");
+        ie.add("/");
         ie.add("asc");
         ie.add("html");
         ie.add("md5");
@@ -54,38 +58,73 @@ public class ArtifactIterator implements Iterator<Artifact> {
         IGNORED_EXTENSIONS = Collections.unmodifiableSet(ie);
     }
 
-    private Deque<String> browseResults;
+    private Deque<String> browseToBeProcessed;
+    private List<String> currentPageLinks;
+    private Deque<Artifact> browseResults;
 
     public ArtifactIterator() {
+        browseToBeProcessed = new ArrayDeque<>(200);
+        currentPageLinks = new ArrayList<>();
         browseResults = new ArrayDeque<>(200);
-        populateBrowse(CentralURLs.ITERATION_URL);
+        populateBrowse(CentralURLs.ITERATION_URL, "");
     }
 
     public ArtifactIterator(String startingGroupPrefix) {
-        browseResults = new ArrayDeque<>(200);
+        browseToBeProcessed = new ArrayDeque<>(100);
+        currentPageLinks = new ArrayList<>();
+        browseResults = new ArrayDeque<>(100);
         String startingGroupURL = startingGroupPrefix.replace('.', '/');
-        populateBrowse(CentralURLs.ITERATION_URL + '/' + startingGroupURL);
+        populateBrowse(CentralURLs.ITERATION_URL + '/' + startingGroupURL, startingGroupURL);
     }
 
     @Override
     public boolean hasNext() {
-        return !browseResults.isEmpty();
+        if (!browseResults.isEmpty()) {
+            return true;
+        }
+        while (!browseToBeProcessed.isEmpty()) {
+            String startingGroupURL = browseToBeProcessed.removeFirst();
+            populateBrowse(CentralURLs.ITERATION_URL + '/' + startingGroupURL, startingGroupURL);
+
+            if (!browseResults.isEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
     public Artifact next() {
-        return null;
+        if (browseResults.isEmpty()) {
+            throw new IllegalStateException("Iterator is exhausted");
+        }
+
+        return browseResults.removeFirst();
     }
 
-    private void populateBrowse(String u) {
+    private void populateBrowse(String u, String startingGroup) {
         try (InputStream is = new BufferedInputStream(new URL(u).openStream())) {
 
             XMLReader r = XMLReaderFactory.createXMLReader();
-            r.setContentHandler(new BrowseHandler(""));
+            r.setContentHandler(new BrowseHandler(startingGroup));
             r.parse(new InputSource(is));
-        } catch (IOException | SAXException e) {
+        } catch (FoundArtifactsException e) {
+            int slash = startingGroup.lastIndexOf("/");
+            String groupId = startingGroup.substring(0, slash).replace('/', '.');
+            String artifactId = startingGroup.substring(slash + 1);
+            Artifact a = new Artifact(groupId, artifactId, null);
+            browseResults.addLast(a);
+            currentPageLinks.clear();
+            return;
+        } catch (IOException |
+
+                SAXException e) {
             // we just won't return results
         }
+
+        browseToBeProcessed.addAll(currentPageLinks);
+        currentPageLinks.clear();
     }
 
     class BrowseHandler extends DefaultHandler {
@@ -100,15 +139,25 @@ public class ArtifactIterator implements Iterator<Artifact> {
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             if ("a".equals(localName)) {
                 String href = attributes.getValue("href");
+                if (href.endsWith("/")) {
+                    href = href.substring(0, href.length() - 1);
+                }
+                if (href.equals(MAVEN_META_DATA)) {
+                    throw new FoundArtifactsException();
+                }
+
                 int dotPos = href.lastIndexOf('.');
 
                 String extension = dotPos < 0 ? "ok" : href.substring(dotPos + 1);
 
                 if (!IGNORED_EXTENSIONS.contains(extension)) {
-                    browseResults.addLast(root + href);
+                    currentPageLinks.add(root + href);
                 }
             }
         }
     }
 
+    static class FoundArtifactsException extends RuntimeException {
+
+    }
 }
