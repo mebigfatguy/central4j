@@ -42,7 +42,7 @@ public class ArtifactIterator implements Iterator<Artifact> {
     private static final Set<String> IGNORED_EXTENSIONS;
 
     static {
-        Set<String> ie = new HashSet<String>();
+        Set<String> ie = new HashSet<>();
         ie.add("");
         ie.add("asc");
         ie.add("html");
@@ -59,6 +59,12 @@ public class ArtifactIterator implements Iterator<Artifact> {
     public ArtifactIterator() {
         browseResults = new ArrayDeque<>(200);
         populateBrowse(CentralURLs.ITERATION_URL);
+    }
+
+    public ArtifactIterator(String startingGroupPrefix) {
+        browseResults = new ArrayDeque<>(200);
+        String startingGroupURL = startingGroupPrefix.replace('.', '/');
+        populateBrowse(CentralURLs.ITERATION_URL + '/' + startingGroupURL);
     }
 
     @Override

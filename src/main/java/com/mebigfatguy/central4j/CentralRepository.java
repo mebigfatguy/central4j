@@ -39,6 +39,10 @@ public class CentralRepository implements Iterable<Artifact> {
         return new ArtifactIterator();
     }
 
+    public Iterator<Artifact> iterator(String startingGroupPrefix) {
+        return new ArtifactIterator(startingGroupPrefix);
+    }
+
     public List<Artifact> getArtifactsByGroupId(String groupId) throws IOException {
 
         URL u = new URL(CentralURLs.SEARCH_URL + "?q=g:\"" + groupId + "\"&rows=100&wt=json");
