@@ -97,7 +97,6 @@
 					<configuration>
 						<archive>
 							<manifestEntries>
-								<fb-contrib-version>${project.version}</fb-contrib-version>
 								<git-revision>${scmBranch} ${buildNumber}
 									${maven.build.timestamp}</git-revision>
 								<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
@@ -176,6 +175,17 @@
 							<shadedPattern>com.mebigfatguy.org.json</shadedPattern>
 						</relocation>
 					</relocations>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Export-Package>com.mebigfatguy.central4j</Export-Package>
+						<Private-Package>com.mebigfatguy.central4j.internal,com.mebigfatguy.org.*</Private-Package>
+					</instructions>
 				</configuration>
 			</plugin>
 			<plugin>
