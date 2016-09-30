@@ -159,5 +159,7 @@ public class ArtifactIterator implements Iterator<Artifact> {
 
     static class FoundArtifactsException extends RuntimeException {
 
+        private static final long serialVersionUID = -6743806019037154885L;
+
     }
 }
