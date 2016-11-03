@@ -105,8 +105,7 @@
 					<configuration>
 						<archive>
 							<manifestEntries>
-								<git-revision>${scmBranch} ${buildNumber}
-									${maven.build.timestamp}</git-revision>
+								<git-revision>${scmBranch} ${buildNumber}</git-revision>
 								<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
 								<Bundle-Name>central4j</Bundle-Name>
 								<Bundle-SymbolicName>central4j; singleton:=true</Bundle-SymbolicName>
