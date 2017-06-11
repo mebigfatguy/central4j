@@ -60,6 +60,26 @@ public class CentralRepositoryTest {
     }
 
     @Test
+    public void testGetArtifactsByClassName() throws IOException {
+
+        CentralRepository r = new CentralRepository();
+
+        List<Artifact> artifacts = r.getArtifactsByClassName("ArtifactIterator");
+
+        Collections.sort(artifacts, new Comparator<Artifact>() {
+
+            @Override
+            public int compare(Artifact o1, Artifact o2) {
+                return o1.getGroupId().compareTo(o2.getGroupId());
+            }
+
+        });
+
+        Artifact expectedArtifact = new Artifact("com.mebigfatguy.central4j", "central4j", "0.2.0");
+        Assert.assertTrue(artifacts.contains(expectedArtifact));
+    }
+
+    @Test
     public void testGetVersions() throws IOException {
 
         CentralRepository r = new CentralRepository();
@@ -76,7 +96,7 @@ public class CentralRepositoryTest {
 
         String version = r.getLatestVersion("com.mebigfatguy.yank", "yank");
 
-        Assert.assertEquals("1.6.1", version);
+        Assert.assertEquals("1.8.0", version);
     }
 
     @Test
