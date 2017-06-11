@@ -22,7 +22,7 @@ public class CentralRepositoryTest {
             artifacts.add(a);
         }
 
-        Assert.assertEquals(10, artifacts.size());
+        Assert.assertEquals(15, artifacts.size());
     }
 
     @Test
