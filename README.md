@@ -11,7 +11,7 @@ Available at maven central with coordinates
          Version: 0.2.0
 
 
-== Usage ==
+## Usage ##
 
 The CentralRepository class holds all the access methods, just create an instance, and use its methods.
 
