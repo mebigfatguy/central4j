@@ -110,7 +110,7 @@ public class ArtifactIterator implements Iterator<Artifact> {
                     href = href.substring(0, href.length() - 1);
                 }
 
-                if (href.equals(MAVEN_META_DATA)) {
+                if (MAVEN_META_DATA.equals(href)) {
                     int slash = startingGroup.lastIndexOf("/");
                     String groupId = startingGroup.substring(0, slash).replace('/', '.');
                     String artifactId = startingGroup.substring(slash + 1);
