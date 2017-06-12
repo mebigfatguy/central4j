@@ -25,6 +25,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.jsoup.Jsoup;
@@ -92,7 +93,7 @@ public class ArtifactIterator implements Iterator<Artifact> {
     @Override
     public Artifact next() {
         if (browseResults.isEmpty()) {
-            throw new IllegalStateException("Iterator is exhausted");
+            throw new NoSuchElementException("Iterator is exhausted");
         }
 
         return browseResults.removeFirst();
