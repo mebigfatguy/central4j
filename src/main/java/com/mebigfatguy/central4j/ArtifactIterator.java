@@ -133,4 +133,9 @@ public class ArtifactIterator implements Iterator<Artifact> {
         browseToBeProcessed.addAll(currentPageLinks);
         currentPageLinks.clear();
     }
+
+    @Override
+    public String toString() {
+        return "To Be Processed: " + browseToBeProcessed + " Current Pages: " + currentPageLinks + " Browse Results: " + browseResults;
+    }
 }
