@@ -1,0 +1,7 @@
+<Project projectName="central4j">
+  <Jar>./target/classes</Jar>
+  <AuxClasspathEntry>../../.m2/repository/org/json/json/20160810/json-20160810.jar</AuxClasspathEntry>
+  <AuxClasspathEntry>../../.m2/repository/org/jsoup/jsoup/1.10.2/jsoup-1.10.2.jar</AuxClasspathEntry>
+  <AuxClasspathEntry>../../.m2/repository/junit/junit/4.12/junit-4.12.jar</AuxClasspathEntry>
+  <SrcDir>./src/main/java</SrcDir>
+</Project>
