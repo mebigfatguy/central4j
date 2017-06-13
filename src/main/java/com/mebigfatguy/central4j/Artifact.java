@@ -17,6 +17,8 @@
  */
 package com.mebigfatguy.central4j;
 
+import java.util.Objects;
+
 public class Artifact implements Comparable<Artifact> {
 
     private String groupId;
@@ -43,7 +45,7 @@ public class Artifact implements Comparable<Artifact> {
 
     @Override
     public int hashCode() {
-        return groupId.hashCode() ^ artifactId.hashCode() ^ version.hashCode();
+        return Objects.hash(groupId, artifactId, version);
     }
 
     @Override
@@ -53,7 +55,7 @@ public class Artifact implements Comparable<Artifact> {
         }
 
         Artifact that = (Artifact) o;
-        return groupId.equals(that.groupId) && artifactId.equals(that.artifactId) && version.equals(that.version);
+        return Objects.equals(groupId, that.groupId) && Objects.equals(artifactId, that.artifactId) && Objects.equals(version, that.version);
     }
 
     @Override
