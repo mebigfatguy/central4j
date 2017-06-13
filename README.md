@@ -40,8 +40,7 @@ The CentralRepository class holds all the access methods, just create an instanc
     InputStream getArtifact(String groupId, String artifactId, String version)
     	// returns the bytes of an artifact
     	
+    Statistics getStatistics() throws IOException
+    	// returns statics about maven central
+    	
     ```
-    	
-    
-    	
-    
