@@ -137,6 +137,7 @@ public class ArtifactIterator implements Iterator<Artifact> {
 
     @Override
     public String toString() {
-        return "To Be Processed: " + browseToBeProcessed + " Current Pages: " + currentPageLinks + " Browse Results: " + browseResults;
+        return "ArtifactIterator [browseToBeProcessed=" + browseToBeProcessed + ", currentPageLinks=" + currentPageLinks + ", browseResults=" + browseResults
+                + "]";
     }
 }

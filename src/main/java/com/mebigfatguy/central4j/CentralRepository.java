@@ -23,16 +23,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import com.mebigfatguy.central4j.internal.CentralURLs;
 
 public class CentralRepository implements Iterable<Artifact> {
+
+    private static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
 
     @Override
     public Iterator<Artifact> iterator() {
@@ -193,6 +201,44 @@ public class CentralRepository implements Iterable<Artifact> {
         URL u = new URL(CentralURLs.DOWNLOAD_URL + '/' + groupId.replace('.', '/') + '/' + artifactId + '/' + version + '/' + artifactId + '-' + version
                 + ((classifier != null) ? ("-" + classifier) : "") + ".jar");
         return u.openStream();
+    }
+
+    public Statistics getStatistics() throws IOException {
+
+        ZonedDateTime lastIndexTime = null;
+        long artifactCount = 0;
+        long uniqueArtifactCount = 0;
+        long repositorySize = 0;
+        List<Artifact> topDownloads = new ArrayList<>();
+
+        URL u = new URL(CentralURLs.STATISTICS_URL);
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+
+            String result = readerToString(br);
+
+            JSONObject jo = new JSONObject(result);
+
+            lastIndexTime = ZonedDateTime.parse(jo.getString("dateModified"), FORMATTER);
+            artifactCount = Long.parseLong(jo.getString("gavNumber").replaceAll("(,|\\.)", ""));
+            uniqueArtifactCount = Long.parseLong(jo.getString("gaNumber").replaceAll("(,|\\.)", ""));
+            repositorySize = Long.parseLong(jo.getString("repoSize").replaceAll("(,|\\.)", ""));
+        }
+
+        Document doc = Jsoup.connect(CentralURLs.TOP_DOWNLOADS_URL).get();
+        Elements dls = doc.getElementsByTag("dl");
+        Element dl = dls.get(1);
+
+        String groupId = null;
+        for (Element child : dl.children()) {
+            if ("dt".equals(child.nodeName())) {
+                groupId = child.text();
+            } else {
+                topDownloads.add(new Artifact(groupId, child.text(), null));
+            }
+        }
+
+        return new Statistics(lastIndexTime, artifactCount, uniqueArtifactCount, repositorySize, topDownloads);
     }
 
     private String readerToString(BufferedReader br) throws IOException {

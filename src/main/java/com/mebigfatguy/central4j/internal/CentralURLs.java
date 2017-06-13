@@ -22,4 +22,6 @@ public class CentralURLs {
     public static final String ITERATION_URL = "http://repo1.maven.org/maven2";
     public static final String SEARCH_URL = "http://search.maven.org/solrsearch/select";
     public static final String DOWNLOAD_URL = "http://repo1.maven.org/maven2";
+    public static final String STATISTICS_URL = "http://search.maven.org/quickstats";
+    public static final String TOP_DOWNLOADS_URL = "http://search.maven.org/content/stats.html";
 }

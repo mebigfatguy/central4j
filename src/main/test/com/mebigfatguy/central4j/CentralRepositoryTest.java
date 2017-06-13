@@ -150,4 +150,15 @@ public class CentralRepositoryTest {
             Assert.assertEquals(8305, total);
         }
     }
+
+    @Test
+    public void testGetStatistics() throws IOException {
+        CentralRepository r = new CentralRepository();
+
+        Statistics statistics = r.getStatistics();
+        Assert.assertNotNull(statistics);
+
+        Artifact junit = new Artifact("junit", "junit", null);
+        Assert.assertTrue(statistics.getTopDownloads().contains(junit));
+    }
 }
