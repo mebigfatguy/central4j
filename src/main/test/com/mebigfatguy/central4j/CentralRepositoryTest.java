@@ -111,6 +111,17 @@ public class CentralRepositoryTest {
     }
 
     @Test
+    public void testGetSHA1() throws IOException {
+
+        CentralRepository r = new CentralRepository();
+
+        String sha1 = r.getSHA1Hash("com.mebigfatguy.fb-delta", "fb-delta", "0.2.0");
+
+        Assert.assertNotNull(sha1);
+        Assert.assertEquals("2c21934b6e0feb4aa3a98c315159a7ad5c03a66e", sha1);
+    }
+
+    @Test
     public void testGetArtifact() throws IOException {
 
         CentralRepository r = new CentralRepository();

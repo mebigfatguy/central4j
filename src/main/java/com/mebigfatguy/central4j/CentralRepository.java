@@ -192,6 +192,16 @@ public class CentralRepository implements Iterable<Artifact> {
         }
     }
 
+    public String getSHA1Hash(String groupId, String artifactId, String version) throws IOException {
+        URL u = new URL(
+                CentralURLs.DOWNLOAD_URL + '/' + groupId.replace('.', '/') + '/' + artifactId + '/' + version + '/' + artifactId + '-' + version + ".jar.sha1");
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+
+            return readerToString(br);
+        }
+    }
+
     public InputStream getArtifact(String groupId, String artifactId, String version) throws IOException {
         return getArtifact(groupId, artifactId, version, null);
     }
