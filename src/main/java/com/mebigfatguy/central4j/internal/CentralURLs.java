@@ -20,8 +20,9 @@ package com.mebigfatguy.central4j.internal;
 public class CentralURLs {
 
     public static final String ITERATION_URL = "http://repo1.maven.org/maven2";
-    public static final String SEARCH_URL = "http://search.maven.org/solrsearch/select";
     public static final String DOWNLOAD_URL = "http://repo1.maven.org/maven2";
-    public static final String STATISTICS_URL = "http://search.maven.org/quickstats";
-    public static final String TOP_DOWNLOADS_URL = "http://search.maven.org/content/stats.html";
+    public static final String SEARCH_BASE_URL = "http://search.maven.org";
+    public static final String SEARCH_URL = SEARCH_BASE_URL + "/solrsearch/select";
+    public static final String STATISTICS_URL = SEARCH_BASE_URL + "/quickstats";
+    public static final String TOP_DOWNLOADS_URL = SEARCH_BASE_URL + "/content/stats.html";
 }
