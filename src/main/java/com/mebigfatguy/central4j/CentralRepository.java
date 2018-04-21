@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -59,7 +60,8 @@ public class CentralRepository implements Iterable<Artifact> {
     public List<Artifact> getArtifactsByGroupId(String groupId) throws IOException {
 
         URL u = new URL(CentralURLs.SEARCH_URL + "?q=g:\"" + groupId + "\"&rows=100&wt=json");
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+        URLConnection c = createConnection(u);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
 
             String result = readerToString(br);
 
@@ -83,7 +85,8 @@ public class CentralRepository implements Iterable<Artifact> {
 
     public List<Artifact> getArtifactsByArtifactId(String artifactId) throws IOException {
         URL u = new URL(CentralURLs.SEARCH_URL + "?q=a:\"" + artifactId + "\"&rows=100&wt=json");
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+        URLConnection c = createConnection(u);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
 
             String result = readerToString(br);
 
@@ -108,7 +111,8 @@ public class CentralRepository implements Iterable<Artifact> {
 
     public List<Artifact> getArtifactsByClassName(String className) throws IOException {
         URL u = new URL(CentralURLs.SEARCH_URL + "?q=c:\"" + className + "\"&rows=100&wt=json");
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+        URLConnection c = createConnection(u);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
 
             String result = readerToString(br);
 
@@ -134,7 +138,8 @@ public class CentralRepository implements Iterable<Artifact> {
     public List<String> getVersions(String groupId, String artifactId) throws IOException {
 
         URL u = new URL(CentralURLs.SEARCH_URL + "?q=g:\"" + groupId + "\"+AND+a:\"" + artifactId + "\"&core=gav&rows=100&wt=json");
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+        URLConnection c = createConnection(u);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
 
             String result = readerToString(br);
 
@@ -159,7 +164,8 @@ public class CentralRepository implements Iterable<Artifact> {
 
     public String getLatestVersion(String groupId, String artifactId) throws IOException {
         URL u = new URL(CentralURLs.SEARCH_URL + "?q=g:\"" + groupId + "\"+AND+a:\"" + artifactId + "\"+AND+p:jar&core=gav&rows=1&wt=json");
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+        URLConnection c = createConnection(u);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
 
             String result = readerToString(br);
 
@@ -261,6 +267,18 @@ public class CentralRepository implements Iterable<Artifact> {
         }
 
         return sb.toString();
+    }
+
+    private URLConnection createConnection(URL u) throws IOException {
+        URLConnection c = u.openConnection();
+        c.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        c.setRequestProperty("Accept-Encoding", "gzip, deflate");
+        c.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+        c.setRequestProperty("Cache-Control", "max-age=0");
+        c.setRequestProperty("Upgrade-Insecure-Requests", "1");
+        c.setRequestProperty("User-Agent", " Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:57.0) Gecko/20100101 Firefox/57.0");
+        c.setRequestProperty("Referer", "http://search.maven.org/");
+        return c;
     }
 
 }
