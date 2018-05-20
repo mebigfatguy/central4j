@@ -62,28 +62,23 @@ public class CentralRepository implements Iterable<Artifact> {
 
     public List<Artifact> getArtifactsByGroupId(String groupId) throws IOException {
 
-        URL u = new URL(CentralURLs.SEARCH_URL + "?q=g:\"" + groupId + "\"&rows=100&wt=json");
-        URLConnection c = createSearchConnection(u);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
+        Document doc = Jsoup.connect(CentralURLs.DOWNLOAD_URL + "/" + groupId.replace('.', '/')).get();
 
-            String result = readerToString(br);
+        Elements artifactElements = doc.getElementsByTag("a");
+        List<Artifact> artifacts = new ArrayList<>();
 
-            JSONObject jo = new JSONObject(result);
-            jo = jo.getJSONObject("response");
-            int count = jo.getInt("numFound");
-
-            List<Artifact> artifacts = new ArrayList<>(count);
-
-            JSONArray docs = jo.getJSONArray("docs");
-
-            for (int i = 0; i < count; i++) {
-                JSONObject jsonArtifact = docs.getJSONObject(i);
-
-                artifacts.add(new Artifact(jsonArtifact.getString("g"), jsonArtifact.getString("a"), jsonArtifact.getString("latestVersion")));
+        for (Element artifactElement : artifactElements) {
+            String artifactId = artifactElement.attr("title");
+            if (artifactId.endsWith("/")) {
+                artifactId = artifactId.substring(0, artifactId.length() - 1);
             }
-
-            return artifacts;
+            if (!artifactId.isEmpty()) {
+                artifacts.add(new Artifact(groupId, artifactId, ""));
+            }
         }
+
+        return artifacts;
+
     }
 
     public List<Artifact> getArtifactsByArtifactId(String artifactId) throws IOException {
@@ -146,6 +141,9 @@ public class CentralRepository implements Iterable<Artifact> {
         List<String> versions = new ArrayList<>(versionElements.size());
         for (Element versionElement : versionElements) {
             String version = versionElement.attr("title");
+            if (version.endsWith("/")) {
+                version = version.substring(0, version.length() - 1);
+            }
             if (!version.isEmpty() && !version.contains("maven-metadata")) {
                 versions.add(version);
             }
