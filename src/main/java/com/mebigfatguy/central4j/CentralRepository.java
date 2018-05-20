@@ -140,29 +140,19 @@ public class CentralRepository implements Iterable<Artifact> {
 
     public List<String> getVersions(String groupId, String artifactId) throws IOException {
 
-        URL u = new URL(CentralURLs.SEARCH_URL + "?q=g:\"" + groupId + "\"+AND+a:\"" + artifactId + "\"&core=gav&rows=100&wt=json");
-        URLConnection c = createSearchConnection(u);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
+        Document doc = Jsoup.connect(CentralURLs.DOWNLOAD_URL + "/" + groupId.replace('.', '/') + "/" + artifactId).get();
+        Elements versionElements = doc.getElementsByTag("a");
 
-            String result = readerToString(br);
-
-            JSONObject jo = new JSONObject(result);
-            jo = jo.getJSONObject("response");
-            int count = jo.getInt("numFound");
-
-            List<String> versions = new ArrayList<>(count);
-
-            JSONArray docs = jo.getJSONArray("docs");
-
-            for (int i = 0; i < count; i++) {
-                JSONObject jsonArtifact = docs.getJSONObject(i);
-
-                versions.add(jsonArtifact.getString("v"));
-
+        List<String> versions = new ArrayList<>(versionElements.size());
+        for (Element versionElement : versionElements) {
+            String version = versionElement.attr("title");
+            if (!version.isEmpty() && !version.contains("maven-metadata")) {
+                versions.add(version);
             }
-
-            return versions;
         }
+
+        return versions;
+
     }
 
     public String getLatestVersion(String groupId, String artifactId) throws IOException {

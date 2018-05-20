@@ -86,7 +86,7 @@ public class CentralRepositoryTest {
 
         List<String> versions = r.getVersions("com.mebigfatguy.yank", "yank");
 
-        Assert.assertEquals("0.2.0", versions.get(versions.size() - 1));
+        Assert.assertEquals(13, versions.size());
     }
 
     @Test
