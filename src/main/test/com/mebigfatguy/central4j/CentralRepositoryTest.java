@@ -96,7 +96,7 @@ public class CentralRepositoryTest {
 
         String version = r.getLatestVersion("com.mebigfatguy.yank", "yank");
 
-        Assert.assertEquals("1.8.0", version);
+        Assert.assertEquals("2.0.0", version);
     }
 
     @Test

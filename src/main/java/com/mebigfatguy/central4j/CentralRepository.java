@@ -154,28 +154,13 @@ public class CentralRepository implements Iterable<Artifact> {
     }
 
     public String getLatestVersion(String groupId, String artifactId) throws IOException {
-        URL u = new URL(CentralURLs.SEARCH_URL + "?q=g:\"" + groupId + "\"+AND+a:\"" + artifactId + "\"+AND+p:jar&core=gav&rows=1&wt=json");
-        URLConnection c = createSearchConnection(u);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
 
-            String result = readerToString(br);
-
-            JSONObject jo = new JSONObject(result);
-            jo = jo.getJSONObject("response");
-
-            int count = jo.getInt("numFound");
-
-            if (count <= 1) {
-                throw new IOException("Artifact with groupId: " + groupId + " and artifactId: " + artifactId + " not found");
-            }
-
-            JSONArray docs = jo.getJSONArray("docs");
-
-            JSONObject jsonArtifact = docs.getJSONObject(0);
-
-            return jsonArtifact.getString("v");
-
+        List<String> versions = getVersions(groupId, artifactId);
+        if (versions.isEmpty()) {
+            return null;
         }
+
+        return versions.get(versions.size() - 1);
     }
 
     public String getPom(String groupId, String artifactId, String version) throws IOException {
