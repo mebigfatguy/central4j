@@ -83,9 +83,14 @@ public class CentralRepository implements Iterable<Artifact> {
     }
 
     public List<Artifact> getArtifactsByArtifactId(String artifactId) throws IOException {
-        URL u = new URL(CentralURLs.SEARCH_URL + "?q=a:\"" + artifactId + "\"&rows=100&wt=json");
+        URL u = new URL(CentralURLs.SEARCH_URL + "?q=a:" + artifactId + "&start=0&rows=100");
         URLConnection c = createSearchConnection(u);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
+
+        c.connect();
+
+        boolean isGZipped = "gzip".equalsIgnoreCase(c.getContentEncoding());
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(isGZipped ? new GZIPInputStream(c.getInputStream()) : c.getInputStream(), StandardCharsets.UTF_8))) {
 
             String result = readerToString(br);
 
@@ -96,12 +101,9 @@ public class CentralRepository implements Iterable<Artifact> {
             List<Artifact> artifacts = new ArrayList<>(count);
 
             JSONArray docs = jo.getJSONArray("docs");
-
-            for (int i = 0; i < count; i++) {
-                JSONObject jsonArtifact = docs.getJSONObject(i);
-
+            for (Object d : docs) {
+                JSONObject jsonArtifact = (JSONObject) d;
                 artifacts.add(new Artifact(jsonArtifact.getString("g"), jsonArtifact.getString("a"), jsonArtifact.getString("latestVersion")));
-
             }
 
             return artifacts;
@@ -109,7 +111,7 @@ public class CentralRepository implements Iterable<Artifact> {
     }
 
     public List<Artifact> getArtifactsByClassName(String className) throws IOException {
-        URL u = new URL(CentralURLs.SEARCH_URL + "?q=c:" + className + "&start=0&rows=20");
+        URL u = new URL(CentralURLs.SEARCH_URL + "?q=c:" + className + "&start=0&rows=100");
         URLConnection c = createSearchConnection(u);
 
         c.connect();
