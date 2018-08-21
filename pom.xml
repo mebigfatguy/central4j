@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.mebigfatguy.central4j</groupId>
 	<artifactId>central4j</artifactId>
-	<version>0.6.2</version>
+	<version>0.6.3</version>
 
 	<prerequisites>
 		<maven>2.2.1</maven>
