@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -108,9 +109,14 @@ public class CentralRepository implements Iterable<Artifact> {
     }
 
     public List<Artifact> getArtifactsByClassName(String className) throws IOException {
-        URL u = new URL(CentralURLs.SEARCH_URL + "?q=c:\"" + className + "\"&rows=100&wt=json");
+        URL u = new URL(CentralURLs.SEARCH_URL + "?q=c:" + className + "&start=0&rows=20");
         URLConnection c = createSearchConnection(u);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream(), StandardCharsets.UTF_8))) {
+
+        c.connect();
+
+        boolean isGZipped = "gzip".equalsIgnoreCase(c.getContentEncoding());
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(isGZipped ? new GZIPInputStream(c.getInputStream()) : c.getInputStream(), StandardCharsets.UTF_8))) {
 
             String result = readerToString(br);
 
@@ -121,12 +127,9 @@ public class CentralRepository implements Iterable<Artifact> {
             List<Artifact> artifacts = new ArrayList<>(count);
 
             JSONArray docs = jo.getJSONArray("docs");
-
-            for (int i = 0; i < count; i++) {
-                JSONObject jsonArtifact = docs.getJSONObject(i);
-
+            for (Object d : docs) {
+                JSONObject jsonArtifact = (JSONObject) d;
                 artifacts.add(new Artifact(jsonArtifact.getString("g"), jsonArtifact.getString("a"), jsonArtifact.getString("v")));
-
             }
 
             return artifacts;
