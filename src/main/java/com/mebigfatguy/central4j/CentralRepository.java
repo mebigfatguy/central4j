@@ -200,44 +200,6 @@ public class CentralRepository implements Iterable<Artifact> {
         return u.openStream();
     }
 
-    public Statistics getStatistics() throws IOException {
-
-        ZonedDateTime lastIndexTime = null;
-        long artifactCount = 0;
-        long uniqueArtifactCount = 0;
-        long repositorySize = 0;
-        List<Artifact> topDownloads = new ArrayList<>();
-
-        URL u = new URL(CentralURLs.STATISTICS_URL);
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
-
-            String result = readerToString(br);
-
-            JSONObject jo = new JSONObject(result);
-
-            lastIndexTime = ZonedDateTime.parse(jo.getString("dateModified"), FORMATTER);
-            artifactCount = Long.parseLong(jo.getString("gavNumber").replaceAll("(,|\\.)", ""));
-            uniqueArtifactCount = Long.parseLong(jo.getString("gaNumber").replaceAll("(,|\\.)", ""));
-            repositorySize = Long.parseLong(jo.getString("repoSize").replaceAll("(,|\\.)", ""));
-        }
-
-        Document doc = Jsoup.connect(CentralURLs.TOP_DOWNLOADS_URL).get();
-        Elements dls = doc.getElementsByTag("dl");
-        Element dl = dls.get(1);
-
-        String groupId = null;
-        for (Element child : dl.children()) {
-            if ("dt".equals(child.nodeName())) {
-                groupId = child.text();
-            } else {
-                topDownloads.add(new Artifact(groupId, child.text(), null));
-            }
-        }
-
-        return new Statistics(lastIndexTime, artifactCount, uniqueArtifactCount, repositorySize, topDownloads);
-    }
-
     private String readerToString(BufferedReader br) throws IOException {
         StringBuilder sb = new StringBuilder();
 
