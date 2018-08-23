@@ -119,7 +119,7 @@
 								<Bundle-Vendor>central4j</Bundle-Vendor>
 								<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
 								<Export-Package>com.mebigfatguy.central4j</Export-Package>
-								<Import-Package></Import-Package>
+								<Import-Package>org.json,org.jsoup</Import-Package>
 							</manifestEntries>
 						</archive>
 					</configuration>
